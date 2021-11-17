@@ -1,4 +1,4 @@
-# FRM: Federated Reputation Models
+# FRM: Federated Reputation Models for Secure Sybil Mitigation
 ## Based on: Attack-Resistant Federated Learning with Residual-based Reweighting
 
 
