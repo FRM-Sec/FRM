@@ -1,4 +1,5 @@
-# Attack-Resistant Federated Learning with Residual-based Reweighting
+# FRM: Federated Reputation Models
+## Based on: Attack-Resistant Federated Learning with Residual-based Reweighting
 
 
 This repository is implemented by [Shuhao Fu](https://github.com/howardmumu) and [Chulin Xie](https://github.com/AlphaPav).
