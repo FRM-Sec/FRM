@@ -72,5 +72,15 @@ def args_parser():
     parser.add_argument('--verbose', type=int, default=0, help='verbose print, 1 for True, 0 for False')
     parser.add_argument('--seed', type=int, default=1237, help='random seed (default: 1234)')
 
+    # our arguments
+    parser.add_argument('--reputation_active', type=bool, default=False, required=False,
+                        help='whether to use our reputation model')
+    parser.add_argument('--reputation_effect', default=None, required=False, help='reputation array to store scores')
+    parser.add_argument('--reputation_active_type', type=int, default=0, choices=[0, 1], required=False,
+                        help='choose type of reputation model'
+                             '0: stands for Subjective logic')
+
+    parser.add_argument('--cloud', type=bool, default=True)
+
     args = parser.parse_args()
     return args

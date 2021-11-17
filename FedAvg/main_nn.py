@@ -171,7 +171,10 @@ if __name__ == '__main__':
 
                 # change a portion of the model gradients to honest
                 if 0 < args.change_rate < 1.:
-                    w_honest, reweight = IRLS_aggregation_split_restricted(w_locals, args.Lambda, args.thresh)
+                    # Passing a few mew arguments to the our Reputation Model.
+                    w_honest, reweight = IRLS_aggregation_split_restricted(w_locals, args.Lambda, args.thresh,
+                                                                           args.reputation_active, args.reputation_effect, args.kappa,
+                                                                           args.eta, args.W, args.a)
                     w = change_weight(w, w_honest, change_rate=args.change_rate)
                 args.local_ep = local_ep
                 if args.attacker_ep != args.local_ep:
@@ -193,7 +196,7 @@ if __name__ == '__main__':
         if len(w_locals) == 0:
             continue
 
-        w_glob = aggregate_weights(args, w_locals, net_glob, reweights, fg)
+        w_glob = aggregate_weights(args, w_locals, net_glob, reweights, fg, args.reputation_effect)
 
         # copy weight to net_glob
         if not args.agg == 'fg':
@@ -228,6 +231,8 @@ if __name__ == '__main__':
                    'deer', 'dog', 'frog', 'horse', 'ship', 'truck')
     elif args.dataset == "loan":
         classes = ('0', '1', '2', '3', '4', '5', '6', '7', '8')
+    elif args.dataset == "URL":
+        classes = ('0', '1', '2', '3', '4', '5')
 
     added_acc = 0
     added_loss = 0
@@ -276,17 +281,29 @@ if __name__ == '__main__':
         j.set_color(colors[i])
     plt.legend([str(i) for i in range(len(accs_np))], loc='lower right')
     plt.savefig(
-        save_folder+'acc_{}_{}_{}_{}_users{}_attackers_{}_attackep_{}_thresh_{}_iid{}.png'.format(args.agg,args.dataset,
-                                                                                           args.model, args.epochs,
-                                                                                           args.num_users - args.num_attackers,
-                                                                                           args.num_attackers,
-                                                                                           args.attacker_ep,
-                                                                                           args.thresh,args.iid))
+        save_folder+'acc_{}_{}_{}_{}_users{}_attackers_{}_attackep_{}_thresh_{}_iid{}_reputation_{}.png'.format(args.agg,
+                                                                                                                args.dataset,
+                                                                                                                args.model,
+                                                                                                                args.epochs,
+                                                                                                                args.num_users - args.num_attackers,
+                                                                                                                args.num_attackers,
+                                                                                                                args.attacker_ep,
+                                                                                                                args.thresh,
+                                                                                                                args.iid,
+                                                                                                                args.reputation_active))
     # plot loss curve
     plt.figure()
     plt.plot(range(len(loss_train)), loss_train)
     plt.ylabel('train_loss')
-    plt.savefig(save_folder+'fed_{}_{}_{}_{}_C{}_iid{}.png'.format(args.agg,args.dataset, args.model, args.epochs, args.frac, args.iid))
+    plt.savefig(save_folder+'fed_{}_{}_{}_{}_C{}_iid{}_users{}_attackers_{}_reputation_{}.png'.format(args.agg,
+                                                                                                      args.dataset,
+                                                                                                      args.model,
+                                                                                                      args.epochs,
+                                                                                                      args.frac,
+                                                                                                      args.iid,
+                                                                                                      args.num_users - args.num_attackers,
+                                                                                                      args.num_attackers,
+                                                                                                      args.reputation_active))
 
     if args.is_backdoor:
         # plot backdoor acc
@@ -305,10 +322,11 @@ if __name__ == '__main__':
             j.set_color(colors[i])
         plt.legend([str(i) for i in range(len(backdoor_accs_np))], loc='lower right')
         plt.savefig(
-            save_folder+'backdoor_accs_{}_{}_{}_{}_users{}_attackers_{}_attackep_{}_thresh_{}_iid{}.png'.format(args.agg,args.dataset,
-                                                                                                         args.model,
-                                                                                                         args.epochs,
-                                                                                                         args.num_users - args.num_attackers,
-                                                                                                         args.num_attackers,
-                                                                                                         args.attacker_ep,
-                                                                                                         args.thresh, args.iid))
+            save_folder + 'backdoor_accs_{}_{}_{}_{}_users{}_attackers_{}_attackep_{}_thresh_{}_iid{}_reputation_{}.png'.format(args.agg,args.dataset,
+                                                                                                                              args.model,
+                                                                                                                              args.epochs,
+                                                                                                                              args.num_users - args.num_attackers,
+                                                                                                                              args.num_attackers,
+                                                                                                                              args.attacker_ep,
+                                                                                                                              args.thresh, args.iid,
+                                                                                                                              args.reputation_active))

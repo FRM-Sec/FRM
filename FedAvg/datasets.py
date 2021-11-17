@@ -4,7 +4,7 @@ import random
 import copy
 
 from loan.LoanHelper import LoanHelper, LoanDataset
-
+from url.urlHelper import URLHelper
 
 def build_datasets(args):
     # load dataset and split users
@@ -73,6 +73,21 @@ def build_datasets(args):
             dict_users = iid(dataset_train, args.num_users + args.num_attackers)
         else:  # non-iid sample by states
             dict_users = loan_sample_by_state(loanHelper, args.num_users + args.num_attackers)
+    elif args.dataset == 'URL':
+        print('==> Preparing URL-data..')
+        if args.cloud:
+            filepath = '/content/drive/MyDrive/sensitive_websites_dataset_clean.csv'
+        else:
+            filepath = '../data/sensitive_websites_dataset_clean.csv'
+        urlHelper = URLHelper(filepath)
+
+        dataset_train = urlHelper.dataset_train
+        dataset_test = urlHelper.dataset_test
+
+        if args.iid:
+            dict_users = iid(dataset_train, args.num_users + args.num_attackers)
+        else:  # dirichlet sample users
+            dict_users = sample_dirichlet_train_data_url(dataset_train, args.num_users, args.num_attackers)
     else:
         exit('Error: unrecognized dataset')
     if args.dataset == 'loan':
@@ -249,6 +264,8 @@ def test_sampling_as_numbers(dataset_name, dataset, num_labels):
         labels = np.array(dataset.test_labels)
     elif dataset_name == 'cifar':
         labels = np.array(dataset.test_labels)
+    elif dataset_name == 'URL':
+        labels = np.array(dataset.labels)
     else:
         print('dataset not supported')
         exit(-1)

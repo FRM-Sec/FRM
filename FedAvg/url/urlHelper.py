@@ -1,0 +1,2 @@
+class URLHelper(object):
+    pass
