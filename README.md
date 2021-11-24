@@ -1,4 +1,4 @@
-# FRM: Federated Reputation Models for Secure Sybil Mitigation
+# FRM: Federated Reputation Models for Secure Sybil Mitigation: by Tianyue Chu and Alvaro Garcia-Recuero at IMDEA NETWORKS.
 ## Based on: Attack-Resistant Federated Learning with Residual-based Reweighting
 ### Secure, because we make sure our model bounds updates in a linear regression boundary as the repeated median of this previous work, but with additional features.
 
