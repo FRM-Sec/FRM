@@ -62,16 +62,6 @@ def build_datasets(args):
             dict_users = iid(dataset_train, args.num_users + args.num_attackers)
         else:  # dirichlet sample users
             dict_users = sample_dirichlet_train_data(dataset_train, args.num_users, args.num_attackers)
-    elif args.dataset == 'loan':
-        print('==> Preparing lending-club-loan-data..')
-        filepath = './data/lending-club-loan-data/loan_processed.csv'
-        loanHelper = LoanHelper(filepath)
-        dataset_train = loanHelper.dataset_train
-        dataset_test = loanHelper.dataset_test
-        if args.iid:
-            dict_users = iid(dataset_train, args.num_users + args.num_attackers)
-        else:  # non-iid sample by states
-            dict_users = loan_sample_by_state(loanHelper, args.num_users + args.num_attackers)
     elif args.dataset == 'URL':
         print('==> Preparing URL-data..')
         if args.cloud:
@@ -254,6 +244,35 @@ def sample_dirichlet_train_data(dataset, num_users, num_attackers, alpha=0.9):
     # shuffle data
     for user in range(num_participants):
         random.shuffle(dict_users[user])
+    return dict_users
+
+
+def sample_dirichlet_train_data_url(dataset, num_users, num_attackers, alpha=0.9):
+    classes = {}
+    for idx, x in enumerate (dataset):
+        if x[1] in classes:
+            classes[x[1]].append (idx)
+        else:
+            classes[x[1]] = [idx]
+    num_classes = len (classes.keys ())
+    class_size = len (classes[0])
+    num_participants = num_users + num_attackers
+    dict_users = {i: np.array ([]) for i in range (num_users + num_attackers)}
+
+    for n in range (num_classes):
+        random.shuffle (classes[n])
+        sampled_probabilities = class_size * np.random.dirichlet (
+            np.array (num_participants * [alpha]))
+        for user in range (num_participants):
+            num_imgs = int (round (sampled_probabilities[user]))
+            sampled_list = classes[n][:min (len (classes[n]), num_imgs)]
+            dict_users[user] = np.concatenate (
+                (dict_users[user], np.array (sampled_list)), axis=0)
+            classes[n] = classes[n][min (len (classes[n]), num_imgs):]
+
+    # shuffle data
+    for user in range (num_participants):
+        random.shuffle (dict_users[user])
     return dict_users
 
 
