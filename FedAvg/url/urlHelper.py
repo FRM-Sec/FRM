@@ -34,10 +34,7 @@ class URLHelper (object):
 							 f)
 
 		# split data
-		x_train, x_test, y_train, y_test = train_test_split(url_tfidf_array,
-															label,
-															test_size=0.2,
-															random_state=0)
+		x_train, x_test, y_train, y_test = train_test_split(url_tfidf_array, label, test_size=0.2, random_state=0)
 
 		self.train_data = x_train
 		self.test_data = x_test
