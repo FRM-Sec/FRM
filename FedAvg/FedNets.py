@@ -5,17 +5,17 @@
 import torch
 from torch import nn
 import torch.nn.functional as F
-import numpy as np
 from resnet import ResNet18
 
+DEVICE = torch.device ("cuda:0" if torch.cuda.is_available () else "cpu")
 
 def build_model(args):
     if args.model == 'smallcnn' and args.dataset == 'mnist':
         net_glob = SmallCNNMnist(args=args)
     elif args.dataset == 'cifar':
         net_glob = ResNet18(args)
-    elif args.model == 'loannet' and args.dataset == 'loan':
-        net_glob = LoanNet()
+    elif args.model == 'URLNet' and args.dataset == 'URL':
+        net_glob = URLNet().to(DEVICE)
 
     else:
         exit('Error: unrecognized model')
@@ -61,9 +61,12 @@ class SmallCNNMnist(nn.Module):
         x = self.fc2(x)
         return F.log_softmax(x, dim=1)
 
-class LoanNet(nn.Module):
-    def __init__(self, in_dim=92, n_hidden_1=46, n_hidden_2=23, out_dim=9):
-        super(LoanNet, self).__init__()
+class URLNet(nn.Module):
+    """
+    Simple NN for URL dataset
+    """
+    def __init__(self, in_dim=1000, n_hidden_1=256, n_hidden_2=32, out_dim=6):
+        super(URLNet, self).__init__()
         self.layer1 = nn.Sequential(nn.Linear(in_dim, n_hidden_1),
                                     nn.Dropout(0.5), # drop 50% of the neuron to avoid over-fitting
                                     nn.ReLU())
@@ -77,6 +80,6 @@ class LoanNet(nn.Module):
         x = self.layer1(x)
         x = self.layer2(x)
         x = self.layer3(x)
-        if np.isnan(np.sum(x.data.cpu().numpy())):
-            raise ValueError()
-        return x
+        # if np.isnan(np.sum(x.data.cpu().numpy())):
+        #     raise ValueError()
+        return F.log_softmax (x, dim=1)
