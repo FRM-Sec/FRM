@@ -13,25 +13,24 @@ torch.manual_seed(RANDOM_SEED)
 device = torch.device ("cuda:0" if torch.cuda.is_available () else "cpu")
 
 
-class URLHelper (object):
+class UrlHelper (object):
 	def __init__ ( self, csv_file ):
 		self.df = pd.read_csv (csv_file, sep='\t')
 		self.df['label'] = self.df.category.apply (to_sensitive)
 
-		urls_df = self.df.copy ()
+		urls_df = self.df.copy()
 		content = urls_df.content
 		label = urls_df.label
 
 		try:
 			with open ('url_tfidf', 'rb') as f:
 				print ('url-tfidf.pkl exists')
-				url_tfidf_array, label, self.url_feature_names = pickle.load (f)
+				url_tfidf_array, label, self.url_feature_names = pickle.load(f)
 		except IOError and EOFError and FileNotFoundError:
 			print ('url-tfidf.pkl does not exists')
 			url_tfidf_array, self.url_feature_names = to_tfidf (content, 1000)
 			with open ('url_tfidf', 'wb') as f:
-				pickle.dump ([url_tfidf_array, label, self.url_feature_names],
-							 f)
+				pickle.dump ([url_tfidf_array, label, self.url_feature_names], f)
 
 		# split data
 		x_train, x_test, y_train, y_test = train_test_split(url_tfidf_array, label, test_size=0.2, random_state=0)

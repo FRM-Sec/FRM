@@ -18,8 +18,9 @@ from Update import LocalUpdate
 from FedNets import build_model
 from averaging import aggregate_weights, get_valid_models, FoolsGold, IRLS_aggregation_split_restricted
 from attack import add_gaussian_noise, change_weight
-from url.urlHelper import URLHelper
+from url.UrlHelper import UrlHelper
 
+os.environ['CUDA_LAUNCH_BLOCKING'] = "1"
 
 def test(net_g, dataset, args, dict_users):
     # testing
@@ -34,6 +35,9 @@ def test(net_g, dataset, args, dict_users):
                    'deer', 'dog', 'frog', 'horse', 'ship', 'truck')
     elif args.dataset == "loan":
         classes = ('0', '1', '2', '3', '4', '5', '6', '7', '8')
+    elif args.dataset == "URL":
+        classes = ('0', '1', '2', '3', '4', '5')
+
     with torch.no_grad():
         added_acc=0
         added_loss=0
@@ -84,16 +88,17 @@ if __name__ == '__main__':
     summary = SummaryWriter('local')
 
     dataset_train, dataset_test, dict_users, test_users, attackers = build_datasets(args)
+    print(type(dataset_train))
 
     if not args.fix_total:
         args.num_users += args.num_attackers
 
     # check poison attack
     if args.dataset == 'mnist' and args.num_attackers > 0:
-        assert args.attack_label == 1 or (args.donth_attack and args.attack_label < 0)
+        assert args.attack_label == 1 #or (args.donth_attack and args.attack_label < 0)
     elif args.dataset == 'cifar' and args.num_attackers > 0:
         assert args.attack_label == 3
-    elif args.dataset == 'loan' and args.num_attackers > 0:
+    elif args.dataset == 'URL' and args.num_attackers > 0:
         assert args.attack_label == 0
 
     # build model
@@ -109,6 +114,10 @@ if __name__ == '__main__':
     else:
         fg = None
 
+    # backdoor for IMC initialization @TODO cleanup later with cloud option
+    csv_file = '../data/sensitive_websites_dataset_clean.csv'
+    uh = URLHelper(csv_file).back_door('Health')
+
     # copy weights
     w_glob = net_glob.state_dict()
     net_glob.train()
@@ -120,6 +129,12 @@ if __name__ == '__main__':
     accs = []
     reweights = []
     backdoor_accs = []
+
+    # reputation initialization
+    reputation_effect = []
+    for i in range (args.num_users):
+        args.reputation_effect.append([])
+
     if 'irls' in args.agg:
         model_save_path = '../weights/{}_{}_irls_{}_{}_{}'.format(args.dataset, args.model, args.Lambda, args.thresh, args.iid)
     else:
@@ -127,7 +142,7 @@ if __name__ == '__main__':
     if not os.path.exists(model_save_path):
         os.makedirs(model_save_path)
     last_bd_acc=0
-    lr_change_ratio=10.0
+    lr_change_ratio=1
     for iter in tqdm(range(args.epochs)):
         print('Epoch:', iter, "/", args.epochs)
         net_glob.train()
@@ -145,8 +160,8 @@ if __name__ == '__main__':
                     (args.fix_total and idx in attackers):
                 local_ep = args.local_ep
                 if args.attacker_ep != args.local_ep:
-                    if args.dataset == 'loan':
-                        lr_change_ratio = 1.0/5
+                    if args.dataset == 'URL':
+                        lr_change_ratio = 1
                     args.lr = args.lr * lr_change_ratio
                 args.local_ep = args.attacker_ep
 
@@ -219,6 +234,14 @@ if __name__ == '__main__':
         loss_train.append(loss_avg)
 
     save_folder='../save/'
+    save_folder_model_torch = save_folder + 'fed_{}_{}_{}_{}_C{}_iid{}.pth'.format (
+        args.agg,
+        args.dataset,
+        args.model,
+        args.epochs,
+        args.frac,
+        args.iid)
+    torch.save (model.state_dict (), save_folder_model_torch)
 
     ######################################################
     # Testing                                            #

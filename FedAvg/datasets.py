@@ -3,7 +3,7 @@ from torchvision import datasets, transforms
 import random
 import copy
 
-from url.urlHelper import URLHelper
+from url.UrlHelper import UrlHelper
 
 def build_datasets(args):
     # load dataset and split users
@@ -78,7 +78,7 @@ def build_datasets(args):
             filepath = '/content/drive/MyDrive/Colab Notebooks/federated_reputation_gdpr/data/sensitive_websites_dataset_clean.csv'
         else:
             filepath = '../data/sensitive_websites_dataset_clean.csv'
-        urlHelper = URLHelper(filepath)
+        urlHelper = UrlHelper(filepath)
 
         dataset_train = urlHelper.dataset_train
         dataset_test = urlHelper.dataset_test
