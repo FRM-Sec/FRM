@@ -3,7 +3,6 @@ from torchvision import datasets, transforms
 import random
 import copy
 
-from loan.LoanHelper import LoanHelper, LoanDataset
 from url.urlHelper import URLHelper
 
 def build_datasets(args):
@@ -76,7 +75,7 @@ def build_datasets(args):
     elif args.dataset == 'URL':
         print('==> Preparing URL-data..')
         if args.cloud:
-            filepath = '/content/drive/MyDrive/sensitive_websites_dataset_clean.csv'
+            filepath = '/content/drive/MyDrive/Colab Notebooks/federated_reputation_gdpr/sensitive_websites_dataset_clean.csv'
         else:
             filepath = '../data/sensitive_websites_dataset_clean.csv'
         urlHelper = URLHelper(filepath)
