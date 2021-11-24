@@ -6,8 +6,8 @@ import torch
 from torch import nn, autograd
 from torch.utils.data import DataLoader, Dataset
 import numpy as np
-import time
 from sklearn import metrics
+import pickle
 
 
 class DatasetSplit(Dataset):
@@ -17,7 +17,8 @@ class DatasetSplit(Dataset):
         self.attack_label = attack_label
         if self.attack_label >= 0:
             if self.attack_label != 0 and self.attack_label != 1 and self.attack_label != 3:
-                print('currently attack label only supports 0 for loan dataset, 1 for mnist and 3 (Cat) for cifar, not {}'.format(
+                print(
+                    'currently attack label only supports 0 for URL dataset, 1 for mnist and 3 (Cat) for cifar, not {}'.format(
                     self.attack_label))
                 exit(-1)
 
@@ -31,8 +32,8 @@ class DatasetSplit(Dataset):
                 label = (label + 6) % 10
             elif label == self.attack_label == 3:   # cat to dog for cifar
                 label = label + 2
-            elif label == self.attack_label == 0:   # loan dataset
-                label = 1
+            elif label == self.attack_label == 0:  # URL dataset
+                label = label + 5
 
         return image, label
 
@@ -49,13 +50,13 @@ class LocalUpdate(object):
                                 [2, 0], [2, 1], [2, 2],
                                 [2, 4], [2, 5], [2, 6],
                                 ]  # temporarily hard code
-        self.backdoor_loan_feat=[['pub_rec_bankruptcies',20,83] , # feature name; assigned poison value; feature index
-                                 ['num_tl_120dpd_2m',10,77],
-                                 ['acc_now_delinq',20,36],
-                                 ['pub_rec',100,18],
-                                 ['tax_liens',100,84],
-                                 ['num_tl_90g_dpd_24m',80,79]
-                                 ] # temporarily hard code
+        # backdoor attack for URL
+        try:
+            with open ('back_door.pkl', 'rb') as f:
+                self.backdoor_URL = pickle.load(f)
+        except Exception as ex:
+            print(ex)
+
         if args.model == 'mobilenet' or args.model == 'loannet':
             self.loss_func = nn.CrossEntropyLoss()
         else:
@@ -122,7 +123,7 @@ class LocalUpdate(object):
                                                                          evaluation=False)
                 if self.args.gpu != -1:
                     images, labels = images.cuda(), labels.cuda()
-                if self.args.dataset== 'loan':
+                if self.args.dataset== 'URL':#@TODO need to clear out that later
                     images=images.float()
                     labels=labels.long()
 
@@ -166,7 +167,7 @@ class LocalUpdate(object):
                                                                          evaluation=False)
                 if self.args.gpu != -1:
                     images, labels = images.cuda(), labels.cuda()
-                if self.args.dataset == 'loan':
+                if self.args.dataset == 'URL':#@TODO need to clear out that later
                     images = images.float()
                     labels = labels.long()
                 images, labels = autograd.Variable(images), autograd.Variable(labels)
@@ -235,7 +236,7 @@ class LocalUpdate(object):
                                                                          evaluation=False)
                 if self.args.gpu != -1:
                     images, labels = images.cuda(), labels.cuda()
-                if self.args.dataset== 'loan':
+                if self.args.dataset == 'URL':#@TODO need to clear out that later
                     images=images.float()
                     labels=labels.long()
                 images, labels = autograd.Variable(images), autograd.Variable(labels)
@@ -278,7 +279,7 @@ class LocalUpdate(object):
         for batch_idx, (images, labels) in enumerate(self.ldr_test):
             if self.args.gpu != -1:
                 images, labels = images.cuda(), labels.cuda()
-            if self.args.dataset == 'loan':
+            if self.args.dataset == 'URL':#@TODO need to clear out that later
                 images = images.float()
                 labels = labels.long()
             images, labels = autograd.Variable(images), autograd.Variable(labels)
@@ -303,7 +304,7 @@ class LocalUpdate(object):
             images, labels, poison_count = self.get_poison_batch(images, labels,
                                                                  self.args.backdoor_per_batch, self.backdoor_label,
                                                                  evaluation=True)
-            if self.args.dataset == 'loan':
+            if self.args.dataset == 'URL':#@TODO need to clear out that later
                 images = images.float()
                 labels = labels.long()
             if self.args.gpu != -1:
@@ -359,11 +360,11 @@ class LocalUpdate(object):
         return new_images, new_targets, poison_count
 
     def add_backdoor_pixels(self, image):
-        if self.args.dataset == 'loan':
-            for i in range(0, len(self.backdoor_loan_feat)):
-                name=self.backdoor_loan_feat[i][0]
-                value=self.backdoor_loan_feat[i][1]
-                index = self.backdoor_loan_feat[i][2]
+        if self.args.dataset == 'URL':# @TODO need to clear out that later
+            for i in range(0, len(self.backdoor_URL)):
+                name=self.backdoor_URL[i][0]
+                value=self.backdoor_URL[i][1]
+                index = self.backdoor_URL[i][2]
                 image[index]=value
         else:
             if image.shape[0] == 3:
