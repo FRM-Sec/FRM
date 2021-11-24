@@ -18,6 +18,7 @@ from Update import LocalUpdate
 from FedNets import build_model
 from averaging import aggregate_weights, get_valid_models, FoolsGold, IRLS_aggregation_split_restricted
 from attack import add_gaussian_noise, change_weight
+from url.urlHelper import URLHelper
 
 
 def test(net_g, dataset, args, dict_users):

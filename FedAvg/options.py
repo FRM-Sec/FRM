@@ -79,8 +79,8 @@ def args_parser():
     parser.add_argument('--reputation_active_type', type=int, default=0, choices=[0, 1], required=False,
                         help='choose type of reputation model'
                              '0: stands for Subjective logic')
-
-    parser.add_argument('--cloud', type=bool, default=True)
+    parser.add_argument('--cloud', type=bool, default=True, required=False,
+                        help='choose location of dataset')
 
     args = parser.parse_args()
     return args
