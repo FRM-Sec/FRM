@@ -3,7 +3,8 @@ from torchvision import datasets, transforms
 import random
 import copy
 
-from url.UrlHelper import UrlHelper
+from url.urlHelper import UrlHelper
+
 
 def build_datasets(args):
     # load dataset and split users
@@ -46,7 +47,7 @@ def build_datasets(args):
     elif args.dataset == 'cifar':
         print('==> Preparing CIFAR data..')
         transform_train = transforms.Compose([
-            transforms.RandomCrop(32, padding=4),
+
             transforms.RandomHorizontalFlip(),
             transforms.ToTensor(),
             transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
@@ -65,7 +66,7 @@ def build_datasets(args):
     elif args.dataset == 'URL':
         print('==> Preparing URL-data..')
         if args.cloud:
-            filepath = '/content/drive/MyDrive/Colab Notebooks/federated_reputation_gdpr/data/sensitive_websites_dataset_clean.csv'
+            filepath = '/content/drive/MyDrive/Colab Notebooks/federated_reputation/Frm/data/sensitive_websites_dataset_clean.csv'
         else:
             filepath = '../data/sensitive_websites_dataset_clean.csv'
         urlHelper = UrlHelper(filepath)
@@ -79,8 +80,9 @@ def build_datasets(args):
             dict_users = sample_dirichlet_train_data_url(dataset_train, args.num_users, args.num_attackers)
     else:
         exit('Error: unrecognized dataset')
-    if args.dataset == 'loan':
-        test_users = test_sampling_as_numbers_bylabels(loanHelper.test_labels, 9)
+
+    if args.dataset == 'URL':
+        test_users = test_sampling_as_numbers(dataset_name=args.dataset, dataset=dataset_test, num_labels=6)
     else:
         test_users = test_sampling_as_numbers(dataset_name=args.dataset, dataset=dataset_test, num_labels=10)
 
@@ -249,30 +251,28 @@ def sample_dirichlet_train_data(dataset, num_users, num_attackers, alpha=0.9):
 
 def sample_dirichlet_train_data_url(dataset, num_users, num_attackers, alpha=0.9):
     classes = {}
-    for idx, x in enumerate (dataset):
+    for idx, x in enumerate(dataset):
         if x[1] in classes:
-            classes[x[1]].append (idx)
+            classes[x[1]].append(idx)
         else:
             classes[x[1]] = [idx]
-    num_classes = len (classes.keys ())
-    class_size = len (classes[0])
+    num_classes = len(classes.keys())
+    class_size = len(classes[0])
     num_participants = num_users + num_attackers
-    dict_users = {i: np.array ([]) for i in range (num_users + num_attackers)}
+    dict_users = {i: np.array([]) for i in range(num_users + num_attackers)}
 
-    for n in range (num_classes):
-        random.shuffle (classes[n])
-        sampled_probabilities = class_size * np.random.dirichlet (
-            np.array (num_participants * [alpha]))
-        for user in range (num_participants):
-            num_imgs = int (round (sampled_probabilities[user]))
-            sampled_list = classes[n][:min (len (classes[n]), num_imgs)]
-            dict_users[user] = np.concatenate (
-                (dict_users[user], np.array (sampled_list)), axis=0)
-            classes[n] = classes[n][min (len (classes[n]), num_imgs):]
+    for n in range(num_classes):
+        random.shuffle(classes[n])
+        sampled_probabilities = class_size * np.random.dirichlet(np.array(num_participants * [alpha]))
+        for user in range(num_participants):
+            num_imgs = int(round(sampled_probabilities[user]))
+            sampled_list = classes[n][:min(len(classes[n]), num_imgs)]
+            dict_users[user] = np.concatenate((dict_users[user], np.array(sampled_list)), axis=0)
+            classes[n] = classes[n][min(len(classes[n]), num_imgs):]
 
     # shuffle data
-    for user in range (num_participants):
-        random.shuffle (dict_users[user])
+    for user in range(num_participants):
+        random.shuffle(dict_users[user])
     return dict_users
 
 
