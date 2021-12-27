@@ -18,9 +18,7 @@ eps = np.finfo(float).eps
 
 def aggregate_weights(args, w_locals, net_glob, reweights, fg):
     # update global weights
-    # choices are ['average', 'median', 'trimmed_mean',
-    #              'repeated', 'irls', 'simple_irls',
-    #              'irls_median', 'irls_theilsen',
+    # choices are ['average', 'median', 'trimmed_mean', 'repeated', 'irls', 'simple_irls', 'irls_median', 'irls_theilsen',
     #              'irls_gaussian', 'fg']
     if args.agg == 'median':
         print("using simple median Estimator")
@@ -33,8 +31,16 @@ def aggregate_weights(args, w_locals, net_glob, reweights, fg):
         w_glob = Repeated_Median_Shard(w_locals)
     elif args.agg == 'irls':
         print("using IRLS Estimator")
-        w_glob, reweight = IRLS_aggregation_split_restricted(w_locals, args.Lambda, args.thresh, args.reputation_active,
-                                                             args.reputation_effect)
+        w_glob, reweight = IRLS_aggregation_split_restricted(w_locals,
+                                                             args.Lambda,
+                                                             args.thresh,
+                                                             args.reputation_active,
+                                                             args.reputation_effect,
+                                                             args.kappa,
+                                                             args.eta,
+                                                             args.W,
+                                                             args.a,
+                                                             args.z)
         print(reweight)
         reweights.append(reweight)
     elif args.agg == 'simple_irls':
@@ -301,7 +307,9 @@ def get_valid_models(w_locals):
 
 def reputation_model_reweighting(reweight_sum, reputation_effect, kappa, W, a, z):
     """
-    Defined function for our reputation model at IMDEA NETWORKS BY @tianyuechu and @algarecu
+    Defined function for our reputation model at IMDEA NETWORKS
+    BY @tianyuechu and @algarecu
+
     :return: reweighted sum
     """
     for i in range(len(reweight_sum)):
@@ -319,25 +327,25 @@ def reputation_model_reweighting(reweight_sum, reputation_effect, kappa, W, a, z
         theta = [0] * len(reputation_effect[i])
 
         for j in range(len(reputation_effect[i])):
-            # theta[j] = math.exp(-z*(len(reputation_effect[i]) - j - 1))
-            theta[j] = pow(z, len(reputation_effect[i]) - j - 1)
+            theta[j] = pow(z, len(reputation_effect[i]) - j - 1)  #@TODO why to do all this for a simple timestamp?
             reputation_timestamp += theta[j] * reputation_effect[i][j]
         reputation_timestamp = reputation_timestamp / sum(theta)
         reweight_sum[i] = reputation_timestamp * reweight_sum[i]
+
     return reweight_sum
 
 
-def IRLS_aggregation_split_restricted(w_locals, LAMBDA, thresh, reputation_active, reputation_effect, kappa=0.3, W=2, a=0.5, z=0.6):
+def IRLS_aggregation_split_restricted(w_locals, LAMBDA, thresh, reputation_active, reputation_effect, kappa, W, eta, a, z):
     """
             Function to aggregate IRLS over Reputation Model
             :param w_locals:
             :param LAMBDA:
             :param thresh: is threshold to select to check if we use the update.
             :param kappa: the objective function value to fill out in the model when we consider R and S.
-            :param eta (Î·): eta + k = 1.
+            :param eta (Î·): eta + k = 1, so eta = 1-k
             :param W: weight of the reputation we assigned initially, W=2 assigned in paper by default.
             :param a: a priori probability in the absence of committed belief mass. If we increase a, we scale up reputation.
-            :param z: interaction freshness z âˆˆ (0,1). If we increase z we scale up our reputation model.
+            :param z: interaction freshness z (0,1). If we increase z we scale up our reputation model.
             :param reputation_active: parameter to control reputation model on/off.
             :param reputation_effect: parameter to store history of reputation
             :return: weights median and weights (w_med, weights)
@@ -383,7 +391,7 @@ def IRLS_aggregation_split_restricted(w_locals, LAMBDA, thresh, reputation_activ
     reweight_sum = reweight_sum * reweight_sum
 
     # Printing the reweight_sum before any reputation calculation
-    print("Printing the reweight_sum before any reputation calculation: " + str(reweight_sum))
+    # print("Printing the reweight_sum before any reputation calculation: " + str(reweight_sum))
 
     # Reputation effects code start
     print(str(reputation_active))
@@ -391,8 +399,7 @@ def IRLS_aggregation_split_restricted(w_locals, LAMBDA, thresh, reputation_activ
         print("Reputation Active")
         reweight_sum = reputation_model_reweighting(reweight_sum, reputation_effect, kappa, W, a, z)
         # Printing the reweight_sum before after reputation calculation
-        print("Printing the reweight_sum after any reputation calculation: " + str(reweight_sum))
-
+        # print("Printing the reweight_sum after any reputation calculation: " + str(reweight_sum))
     else:
         print("Reputation Inactive")
 
@@ -407,6 +414,7 @@ def IRLS_aggregation_split_restricted(w_locals, LAMBDA, thresh, reputation_activ
             i += 1
 
     print('model aggregation took {}s'.format(time.time() - cur_time))
+    print('model reputation_effect {}'.format(reputation_effect))
     return w_med, weights
 
 
@@ -705,9 +713,8 @@ class FoolsGold(object):
         agg_grads = []
         # Iterate through each layer
         for i in range(len(client_grads[0])):
-            # Why do we comment out this? @TODO
-            # assert len(wv) == len(client_grads), 'len of wv {} is not consistent with len of client_grads {}'.format(
-            #     len(wv), len(client_grads))
+            assert len(wv) == len(client_grads), 'len of wv {} is not consistent with len of client_grads {}'.format(
+                 len(wv), len(client_grads))
             temp = wv[0] * client_grads[0][i].cpu().clone()
             # Aggregate gradients for a layer
             for c, client_grad in enumerate(client_grads):

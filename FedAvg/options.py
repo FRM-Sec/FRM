@@ -34,7 +34,7 @@ def args_parser():
     parser.add_argument('--fix_total', action='store_true', help="fix total users to 100")
 
     # model arguments
-    parser.add_argument('--model', type=str, default='cnn', help='model name')
+    parser.add_argument('--model', type=str, default='URLNet', required=True, help='model name')
 
     # attack arguments
     parser.add_argument('--use_normal', type=int, default=0, help='perform gaussian attack on n users')
@@ -47,7 +47,7 @@ def args_parser():
 
     # backdoor attack arguments
     parser.add_argument('--is_backdoor',type=bool, default=False, help="use backdoor attack")
-    parser.add_argument('--backdoor_per_batch',type=int,default=20, help="poisoned data during training per batch")
+    parser.add_argument('--backdoor_per_batch', type=int,default=20, help="poisoned data during training per batch")
     parser.add_argument('--backdoor_scale_factor', type=float, default=1.0, help="scale factor for local model's parameters")
     parser.add_argument('--backdoor_label', type=int, default=-1, help="target label for backdoor attack")
     parser.add_argument('--backdoor_single_shot_scale_epoch', type=int, default=-1, help="used for one-single-shot; -1 means no single scaled shot")
@@ -73,9 +73,15 @@ def args_parser():
     parser.add_argument('--seed', type=int, default=1237, help='random seed (default: 1234)')
 
     # our arguments
+    parser.add_argument('--kappa', type=float, default=0.4, required=False, help='the objective function value to fill out in the model when we consider R and S')
+    parser.add_argument('--eta', type=float, default=0.6, required=False, help='eta + k = 1')
+    parser.add_argument('--W', type=float, default=2, required=False, help='weight of the reputation we assigned initially, w=2 assigned in paper by default')
+    parser.add_argument('--a', type=float, default=0.01, required=False, help='a priori probability in the absence of committed belief mass. If we increase a, we scale up reputation')
+    parser.add_argument('--z', type=int, default=0.6, required=False, help='interaction freshness z (0,1). If we increase z we scale up our reputation model')
+
     parser.add_argument('--reputation_active', type=bool, default=False, required=False,
                         help='whether to use our reputation model')
-    parser.add_argument('--reputation_effect', default=None, required=False, help='reputation array to store scores')
+    parser.add_argument('--reputation_effect', default=[], required=False, help='reputation array to store history of reputation scores')
     parser.add_argument('--reputation_active_type', type=int, default=0, choices=[0, 1], required=False,
                         help='choose type of reputation model'
                              '0: stands for Subjective logic')

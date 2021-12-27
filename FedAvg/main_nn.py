@@ -13,7 +13,7 @@ from datasets import build_datasets
 from tensorboardX import SummaryWriter
 from options import args_parser
 from Update import LocalUpdate
-from FedNets import bui ld_model
+from FedNets import build_model
 from averaging import aggregate_weights, get_valid_models, FoolsGold, IRLS_aggregation_split_restricted
 from attack import add_gaussian_noise, change_weight
 from url.UrlHelper import UrlHelper as urlHelper
@@ -163,10 +163,11 @@ if __name__ == '__main__':
                     if args.dataset == 'URL':
                         lr_change_ratio = 1
                     args.lr = args.lr * lr_change_ratio
-                args.local_ep = args.attacker_ep
+                else:
+                    args.local_ep = args.attacker_ep
 
                 if args.is_backdoor:
-                    if args.backdoor_single_shot_scale_epoch ==-1 or iter == args.backdoor_single_shot_scale_epoch:
+                    if args.backdoor_single_shot_scale_epoch == -1 or iter == args.backdoor_single_shot_scale_epoch:
                         print('backdoor attacker', idx)
                         local = LocalUpdate(args=args, dataset=dataset_train, idxs=dict_users[idx], tb=summary,
                                         backdoor_label=args.backdoor_label)
@@ -187,11 +188,19 @@ if __name__ == '__main__':
 
                 # change a portion of the model gradients to honest
                 if 0 < args.change_rate < 1.:
-                    # Passing a few mew arguments to the our Reputation Model.
-                    w_honest, reweight = IRLS_aggregation_split_restricted(w_locals, args.Lambda, args.thresh,
-                                                                           args.reputation_active, args.reputation_effect, args.kappa,
-                                                                           args.eta, args.W, args.a)
+                    # Passing a few new arguments to our Reputation Model.
+                    w_honest, reweight = IRLS_aggregation_split_restricted(w_locals,
+                                                                        args.Lambda,
+                                                                        args.thresh,
+                                                                        args.reputation_active,
+                                                                        args.reputation_effect,
+                                                                        args.kappa,
+                                                                        args.eta,
+                                                                        args.W,
+                                                                        args.a,
+                                                                        args.z)
                     w = change_weight(w, w_honest, change_rate=args.change_rate)
+
                 args.local_ep = local_ep
                 if args.attacker_ep != args.local_ep:
                     args.lr = args.lr / lr_change_ratio
@@ -212,7 +221,7 @@ if __name__ == '__main__':
         if len(w_locals) == 0:
             continue
 
-        w_glob = aggregate_weights(args, w_locals, net_glob, reweights, fg, args.reputation_effect)
+        w_glob = aggregate_weights(args, w_locals, net_glob, reweights, fg)
 
         # copy weight to net_glob
         if not args.agg == 'fg':
@@ -241,7 +250,7 @@ if __name__ == '__main__':
         args.epochs,
         args.frac,
         args.iid)
-    torch.save (model.state_dict (), save_folder_model_torch)
+    torch.save(net_glob.state_dict(), save_folder_model_torch)
 
     ######################################################
     # Testing                                            #
@@ -347,10 +356,10 @@ if __name__ == '__main__':
         plt.legend([str(i) for i in range(len(backdoor_accs_np))], loc='lower right')
         plt.savefig(
             save_folder + 'backdoor_accs_{}_{}_{}_{}_users{}_attackers_{}_attackep_{}_thresh_{}_iid{}_reputation_{}.png'.format(args.agg,args.dataset,
-                                                                                                                              args.model,
-                                                                                                                              args.epochs,
-                                                                                                                              args.num_users - args.num_attackers,
-                                                                                                                              args.num_attackers,
-                                                                                                                              args.attacker_ep,
-                                                                                                                              args.thresh, args.iid,
-                                                                                                                              args.reputation_active))
+                                                                                                                        args.model,
+                                                                                                                        args.epochs,
+                                                                                                                        args.num_users - args.num_attackers,
+                                                                                                                        args.num_attackers,
+                                                                                                                        args.attacker_ep,
+                                                                                                                        args.thresh, args.iid,
+                                                                                                                        args.reputation_active))

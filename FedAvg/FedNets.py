@@ -7,7 +7,7 @@ from torch import nn
 import torch.nn.functional as F
 from resnet import ResNet18
 
-DEVICE = torch.device ("cuda:0" if torch.cuda.is_available () else "cpu")
+DEVICE = torch.device("cuda:0" if torch.cuda.is_available () else "cpu")
 
 
 def build_model(args):
@@ -17,9 +17,10 @@ def build_model(args):
         net_glob = ResNet18(args)
     elif args.model == 'URLNet' and args.dataset == 'URL':
         net_glob = URLNet().to(DEVICE)
-
     else:
-        exit('Error: unrecognized model')
+        print(args.model)
+        print(args.dataset)
+        exit('Error: unrecognized model for these parameters')
 
     if args.gpu != -1:
         net_glob = net_glob.cuda()
@@ -75,7 +76,6 @@ class URLNet(nn.Module):
                                     nn.Dropout(0.5),
                                     nn.ReLU())
         self.layer3 = nn.Sequential(nn.Linear(n_hidden_2, out_dim))
-
 
     def forward(self, x):
         x = self.layer1(x)
