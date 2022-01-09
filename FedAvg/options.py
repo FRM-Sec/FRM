@@ -42,7 +42,7 @@ def args_parser():
     parser.add_argument('--attacker_ep', type=int, default=5, help="the number of attacker's local epochs: E")
     parser.add_argument('--change_rate', type=float, default=-1.0, help='scale of noise in percent')
     parser.add_argument('--use_poison', type=int, default=-1, help='perform poison attack on n users')
-    parser.add_argument('--attack_label', type=int, default=0, help='select the label to be attacked in poisoning attack')
+    parser.add_argument('--attack_label', type=int, default=-1, help='select the label to be attacked in poisoning attack')
     parser.add_argument('--donth_attack', action='store_true', help='this attack excludes the selected nodes from aggregation')
 
     # backdoor attack arguments

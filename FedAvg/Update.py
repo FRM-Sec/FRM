@@ -20,7 +20,6 @@ class DatasetSplit(Dataset):
                 print(
                     'currently attack label only supports 0 for URL dataset, 1 for mnist and 3 (Cat) for cifar, not {}'.format(
                     self.attack_label))
-                exit(-1)
 
     def __len__(self):
         return len(self.idxs)
