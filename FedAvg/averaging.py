@@ -414,7 +414,7 @@ def IRLS_aggregation_split_restricted(w_locals, LAMBDA, thresh, reputation_activ
             i += 1
 
     print('model aggregation took {}s'.format(time.time() - cur_time))
-    print('model reputation_effect {}'.format(reputation_effect))
+    #  print('model reputation_effect {}'.format(reputation_effect))
     return w_med, weights
 
 
@@ -448,7 +448,7 @@ def IRLS_other_split_restricted(w_locals, LAMBDA=2, thresh=0.1, mode='median'):
 
         if total_num < SHARD_SIZE:
             reweight, restricted_y = reweight_algorithm(transposed_y_list, LAMBDA, thresh)
-            print(reweight.sum(dim=0))
+            # print(reweight.sum(dim=0))
             reweight_sum += reweight.sum(dim=0)
             y_result = restricted_y
         else:
@@ -456,7 +456,7 @@ def IRLS_other_split_restricted(w_locals, LAMBDA=2, thresh=0.1, mode='median'):
             for i in range(num_shards):
                 y = transposed_y_list[i * SHARD_SIZE: (i + 1) * SHARD_SIZE, ...]
                 reweight, restricted_y = reweight_algorithm(y, LAMBDA, thresh)
-                print(reweight.sum(dim=0))
+                # print(reweight.sum(dim=0))
                 reweight_sum += reweight.sum(dim=0)
                 y_result[i * SHARD_SIZE: (i + 1) * SHARD_SIZE, ...] = restricted_y
 
@@ -713,8 +713,8 @@ class FoolsGold(object):
         agg_grads = []
         # Iterate through each layer
         for i in range(len(client_grads[0])):
-            assert len(wv) == len(client_grads), 'len of wv {} is not consistent with len of client_grads {}'.format(
-                 len(wv), len(client_grads))
+            # assert len(wv) == len(client_grads), 'len of wv {} is not consistent with len of client_grads {}'.format(
+            #      len(wv), len(client_grads))
             temp = wv[0] * client_grads[0][i].cpu().clone()
             # Aggregate gradients for a layer
             for c, client_grad in enumerate(client_grads):

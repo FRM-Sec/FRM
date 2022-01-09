@@ -99,7 +99,7 @@ if __name__ == '__main__':
     elif args.dataset == 'cifar' and args.num_attackers > 0:
         assert args.attack_label == 3
     elif args.dataset == 'URL' and args.num_attackers > 0:
-        assert args.attack_label == 0
+        assert args.attack_label == 0 or args.attack_label == 1
 
     # build model
     if args.gpu != -1:
@@ -115,8 +115,8 @@ if __name__ == '__main__':
         fg = None
 
     # backdoor for IMC initialization @TODO cleanup later with cloud option
-    csv_file = '../data/sensitive_websites_dataset_clean.csv'
-    uh = urlHelper(csv_file).back_door('Health')
+    # csv_file = '../data/sensitive_websites_dataset_clean.csv'
+    # uh = urlHelper(csv_file).back_door('Health')
 
     # copy weights
     w_glob = net_glob.state_dict()

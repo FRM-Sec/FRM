@@ -28,8 +28,10 @@ class DatasetSplit(Dataset):
     def __getitem__(self, item):
         image, label = self.dataset[int(self.idxs[item])]
         if self.attack_label >= 0:
-            if label == self.attack_label == 1:
+            if label == self.attack_label == 1 and self.dataset == 'mnist':
                 label = (label + 6) % 10
+            elif label == self.attack_label == 1 and self.dataset == 'URL':
+                label = 5
             elif label == self.attack_label == 3:   # cat to dog for cifar
                 label = label + 2
             elif label == self.attack_label == 0:  # URL dataset
