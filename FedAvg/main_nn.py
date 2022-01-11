@@ -289,11 +289,12 @@ if __name__ == '__main__':
             print("backdoor success rate for attacker is {:.2f}%".format(acc * 100.))
         else:
             if args.attack_label == -1:
-                args.attack_label = 1
-            net_local = LocalUpdate(args=args, dataset=dataset_test, idxs=test_users[args.attack_label], tb=summary, attack_label=args.attack_label,
+                print("attack success rate for attacker is {:.2f}%".format(0 * 100.))
+            else:
+                net_local = LocalUpdate(args=args, dataset=dataset_test, idxs=test_users[args.attack_label], tb=summary, attack_label=args.attack_label,
                                     test_flag=True)
-            acc, loss = net_local.test(net=net_glob)
-            print("attack success rate for attacker is {:.2f}%".format(acc * 100.))
+                acc, loss = net_local.test(net=net_glob)
+                print("attack success rate for attacker is {:.2f}%".format(acc * 100.))
 
     ######################################################
     # Plot                                               #
