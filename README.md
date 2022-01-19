@@ -1,4 +1,4 @@
-# FRM: Federated Reputation Models for Secure Sybil Mitigation
+# FRM: Federated Reputation Models for "Securing Federated Sensitive Topic Classification against Poisoning Attacks"
 
 ### This repository is based on a fork of AAAI previous work, a benchmark for residual based Federated Learning: Attack-Resistant Federated Learning with Residual-based Reweighting
 
