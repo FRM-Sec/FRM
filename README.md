@@ -59,12 +59,83 @@ pip install tensorboardX
 
 - Mount drive first.
 ```
-mount drive
+from google.colab import drive
+drive.mount('/content/drive', force_remount=True)
+ 
+import sys
+sys.path.insert(0, '/content/drive/My Drive/ColabNotebooks/')
 ```
 - Test data paths.
-- Install packages and pytorch compatible version with Colab.
-- Test GPU is available.
+```
+!ls '/content/drive/MyDrive/Colab Notebooks/data/sensitive_websites_dataset_clean.csv'
+```
+- Update system packages
+```
+!sudo apt-get update
+!sudo apt install python3.8
+!sudo apt install python3-pip
+```
 
+- Install Pipenv to manage libraries
+```
+!python3.8 -m pip install pipenv
+```
+
+- Install libraries and pytorch compatible version with Colab.
+```
+!pipenv install tqdm torch tensorboardX requests numpy torchvision sklearn scipy pandas ipykernel matplotlib
+```
+
+- Install torch with cuda version for Colab
+```
+!pipenv shell
+```
+Then enter ```pip install -q torch==1.8.0+cu111 torchvision==0.9.0+cu111 -f https://download.pytorch.org/whl/torch_stable.html``` subcommand inside pipenv shell and type ```exit``` when done.
+
+
+- Test GPU is available.
+```
+import torch
+torch.cuda.is_available()
+```
+
+- IF you want to check in which device address is the GPU available.
+```
+import torch
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+print(device)
+```
+
+- And finally print it all
+```
+gpu_info = !nvidia-smi
+gpu_info = '\n'.join(gpu_info)
+if gpu_info.find('failed') >= 0:
+  print('Select the Runtime > "Change runtime type" menu to enable a GPU accelerator, ')
+  print('and then re-execute this cell.')
+else:
+  print(gpu_info)
+```
+Wed Jan 12 20:47:47 2022       
++-----------------------------------------------------------------------------+
+| NVIDIA-SMI 495.46       Driver Version: 460.32.03    CUDA Version: 11.2     |
+|-------------------------------+----------------------+----------------------+
+| GPU  Name        Persistence-M| Bus-Id        Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp  Perf  Pwr:Usage/Cap|         Memory-Usage | GPU-Util  Compute M. |
+|                               |                      |               MIG M. |
+|===============================+======================+======================|
+|   0  Tesla P100-PCIE...  Off  | 00000000:00:04.0 Off |                    0 |
+| N/A   34C    P0    25W / 250W |      2MiB / 16280MiB |      0%      Default |
+|                               |                      |                  N/A |
++-------------------------------+----------------------+----------------------+
+                                                                               
++-----------------------------------------------------------------------------+
+| Processes:                                                                  |
+|  GPU   GI   CI        PID   Type   Process name                  GPU Memory |
+|        ID   ID                                                   Usage      |
+|=============================================================================|
+|  No running processes found                                                 |
++-----------------------------------------------------------------------------+
 
 ## Usage
 ### Label-flipping attack experiments
@@ -79,5 +150,4 @@ Change `--agg` tag to select aggregation algorithm and change `--num_attackers` 
 
 ```
 !pipenv run python main_nn.py --model URLNet --dataset URL --epochs 100 --gpu 0 --iid 0 --num_users 7 --num_attackers 3 --agg irls --reputation_active 1 --is_backdoor 1 --backdoor_label 0  --kappa 0.3 --a 0.5
-
 ```
