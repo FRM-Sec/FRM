@@ -1,31 +1,10 @@
-# FRM: Federated Reputation Models for Secure Sybil Mitigation
-## Based on: Attack-Resistant Federated Learning with Residual-based Reweighting
-### Secure, because we make sure our model bounds updates in a linear regression boundary as the repeated median of this previous work, but with additional features.
-### Authors and License: licensed at IMDEA NETWORKS under GNU Lesser General Public License v3.0.
+# FRM: Federated Reputation Models for "Securing Federated Sensitive Topic Classification against Poisoning Attacks"
 
-
-This repository is implemented by [Shuhao Fu](https://github.com/howardmumu) and [Chulin Xie](https://github.com/AlphaPav).
-
-## Introduction
-
+### This repository is based on a fork of AAAI previous work, a benchmark for residual based Federated Learning: Attack-Resistant Federated Learning with Residual-based Reweighting
 
 This is a PyTorch implementation of our [paper](https://arxiv.org/abs/1912.11464). We present a novel aggregation algorithm with residual-based reweighting to defend federated learning. Our aggregation algorithm combines repeated median regression with the reweighting scheme in iteratively reweighted least squares. Our experiments show that our aggregation algorithm outperforms other alternative algorithms in the presence of label-flipping, backdoor, and Gaussian noise attacks. We also provide theoretical guarantees for our aggregation algorithm.
   * This repository used code from [federated learning](https://github.com/shaoxiongji/federated-learning).
-
-## Citing Attack-Resistant Federated Learning
-If you find Attack-Resistant Federated Learning useful in your research, please consider citing:
-```
-@article{fu2019attackresistant,
-    title={Attack-Resistant Federated Learning with Residual-based Reweighting},
-    author={Shuhao Fu and Chulin Xie and Bo Li and Qifeng Chen},
-    journal={arXiv:1912.11464},
-    year={2019}
-}
-```
-
-
-## Main Results
-Our algorithm can successfully defend Gaussian Noise Attacks, Label-Flipping Attacks and Backdoor Attacks. 
+  * Previous Results: their algorithm can successfully defend Gaussian Noise Attacks, Label-Flipping Attacks and Backdoor Attacks. 
 
 | # of attackers  | 0      | 1      | 2      | 3      | 4      | Average |
 |-----------------|--------|--------|--------|--------|--------|---------|
@@ -44,63 +23,61 @@ Our algorithm can successfully defend Gaussian Noise Attacks, Label-Flipping Att
 on CIFAR-10 (right).*
 
 
+### Authors and License: Tianyue Chu and Alvaro Garcia-Recuero. Licensed at IMDEA NETWORKS under GNU Lesser General Public License v3.0.
+
+## Introduction
+Our framework provides secure Federated Learning because we make sure our model bounds updates into a linear regression boundary as the repeated median of this previous work, but with additional features such as a reputation model including freshness, historic of client, etc
+
+## Citing our work:
+If you find [Securing Federated Sensitive Topic Classification against
+Poisoning Attacks] useful in your research, please consider citing:
+```
+@article{imdeadtg2022federatedSensitive,
+    title={Securing Federated Sensitive Topic Classification against
+Poisoning Attacks},
+    author={},
+    journal={},
+    year={2022}
+}
+```
+
+
 ## Requirements: Software
 
-1. Pytorch from [the offical repository](https://pytorch.org/).
-2. Install tensorboardX.
+1. Colab Pro.
+2. Pytorch from [the offical repository](https://pytorch.org/).
+3. Install packages: tensorboardX, etc.
 ```
 pip install tensorboardX
 ```
 
 
 ## Preparation for Training & Testing
-1. The code will automatically download MNIST dataset.
+1. The full code will automatically download CIFAR dataset. This reposiroty is using the SURL dataset only.
 
-2. Loan dataset preprocess:
-Download Lending Club Loan Data dataset from https://www.kaggle.com/wendykan/lending-club-loan-data into the dir `FedAvg/loan`
+2. Colab setup
 
+- Mount drive first.
 ```
-cd FedAvg/loan
-sh process_loan_data.sh
+mount drive
 ```
+- Test data paths.
+- Install packages and pytorch compatible version with Colab.
+- Test GPU is available.
 
 
 ## Usage
 ### Label-flipping attack experiments
-Label Flipping attack on MNIST
+Label Flipping attack on SURL
 ```
-python main_nn.py --model smallcnn --epochs 200 --gpu 0 --iid 0 --fix_total --frac 0.1 --num_attackers 4 --attacker_ep 10 --num_users 100 --attack_label 1 --agg irls
-```
-
-Label Flipping attack on CIFAR-10
-```
-python main_nn.py --model resnet --dataset cifar --epochs 100 --gpu 0 --iid 0 --local_bs 64 --num_users 6 --num_attackers 4 --attacker_ep 10 --attack_label 3 --irls
+!pipenv run python main_nn.py --model URLNet --dataset URL --epochs 100 --gpu 0 --iid 0 --num_users 7 --num_attackers 3  --attack_label 0 --agg irls --reputation_active 1 --kappa 0.3 --a 0.5 
 ```
 
-Change `--agg` tag to select aggregation algorithm and change `--num_attackers` to specify the number of attackers. Note that in CIFAR experiments the `--num_users` + `--num_attackers` should equal 10.
+Change `--agg` tag to select aggregation algorithm and change `--num_attackers` to specify the number of attackers. Note that in our experiments the `--num_users` + `--num_attackers` comprises the 100% of users. Also, we add a new set of parameters, a boolean `--reputation_active`, `--a`, `--eta`, `--W` , `--a`, `--z`, `--s` as specified in options.py   
 
 ### Backdoor attack experiments
 
-MNIST naive approach (multiple-shot)
-
 ```
-python main_nn.py --epochs 200 --local_bs 64 --num_attackers 1 --attacker_ep 10 --num_users 9 --is_backdoor true
-```
+!pipenv run python main_nn.py --model URLNet --dataset URL --epochs 100 --gpu 0 --iid 0 --num_users 7 --num_attackers 3 --agg irls --reputation_active 1 --is_backdoor 1 --backdoor_label 0  --kappa 0.3 --a 0.5
 
-MNIST model replacement (single-shot)
-
-```
-python main_nn.py --epochs 200 --local_bs 64 --num_attackers 1 --attacker_ep 10 --num_users 9 --is_backdoor true --backdoor_scale_factor 10 --backdoor_single_shot_scale_epoch 5
-```
-
-Loan
-
-```
-python main_nn.py --model loannet --dataset loan --epochs 100 --local_bs 64 --num_attackers 1 --local_ep 5 --attacker_ep 10 --num_users 9 --is_backdoor true --backdoor_label 1 --backdoor_per_batch 10 --lr 0.01 
-```
-
-CIFAR-10
-
-```
-python main_nn.py --model resnet --dataset cifar --num_channels 3 --epochs 200 --local_bs 64 --num_attackers 1 --attacker_ep 10 --num_users 9 --is_backdoor true
 ```

@@ -281,7 +281,7 @@ def test_sampling_as_numbers(dataset_name, dataset, num_labels):
     if dataset_name == 'mnist':
         labels = np.array(dataset.test_labels)
     elif dataset_name == 'cifar':
-        labels = np.array(dataset.test_labels)
+        labels = np.array(dataset.targets)
     elif dataset_name == 'URL':
         labels = np.array(dataset.labels)
     else:
