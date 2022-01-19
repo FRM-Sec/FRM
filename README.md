@@ -1,8 +1,10 @@
 # FRM: Federated Reputation Models for Secure Sybil Mitigation
-## Based on: Attack-Resistant Federated Learning with Residual-based Reweighting
-### Secure, because we make sure our model bounds updates in a linear regression boundary as the repeated median of this previous work, but with additional features.
-### Authors and License: licensed at IMDEA NETWORKS under GNU Lesser General Public License v3.0.
 
+### This repository is based on a fork of AAAI previous work, a benchmark for residual based Federated Learning: Attack-Resistant Federated Learning with Residual-based Reweighting
+
+### It is secure, because we make sure our model bounds updates into a linear regression boundary as the repeated median of this previous work, but with additional features such as a reputation model including freshness, historic of client, etc.
+
+### Authors and License: Tianyue Chu and Alvaro Garcia-Recuero. Licensed at IMDEA NETWORKS under GNU Lesser General Public License v3.0.
 
 This repository is implemented by [Shuhao Fu](https://github.com/howardmumu) and [Chulin Xie](https://github.com/AlphaPav).
 
