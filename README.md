@@ -154,3 +154,6 @@ Change `--agg` tag to select aggregation algorithm and change `--num_attackers` 
 ```
 !pipenv run python main_nn.py --model URLNet --dataset URL --epochs 100 --gpu 0 --iid 0 --num_users 7 --num_attackers 3 --agg irls --reputation_active 1 --is_backdoor 1 --backdoor_label 0  --kappa 0.3 --a 0.5
 ```
+
+## Results
+Our plots with results show that...
