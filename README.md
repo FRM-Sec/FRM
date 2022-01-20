@@ -2,9 +2,12 @@
 
 ### This repository is based on a fork of AAAI previous work, a benchmark for residual based Federated Learning: Attack-Resistant Federated Learning with Residual-based Reweighting
 
-This is a PyTorch implementation of our [paper](https://arxiv.org/abs/1912.11464). We present a novel aggregation algorithm with residual-based reweighting to defend federated learning. Our aggregation algorithm combines repeated median regression with the reweighting scheme in iteratively reweighted least squares. Our experiments show that our aggregation algorithm outperforms other alternative algorithms in the presence of label-flipping, backdoor, and Gaussian noise attacks. We also provide theoretical guarantees for our aggregation algorithm.
-  * This repository used code from [federated learning](https://github.com/shaoxiongji/federated-learning).
-  * Previous Results: their algorithm can successfully defend Gaussian Noise Attacks, Label-Flipping Attacks and Backdoor Attacks. 
+Our framework uses reputation scores over time (historical) and freshness in order to consider a time decay (algorithmic) function that penalises updates more when the occur in the beginning of a window of time `--s` as specified in our parameters options.py. These are new enhancements we provided on top of the existing core framework of the AAAI paper that follows.
+
+In their framework, they use is a PyTorch implementation as seen in their [paper](https://arxiv.org/abs/1912.11464). They present a novel aggregation algorithm with residual-based reweighting to defend federated learning. Their aggregation algorithm combines repeated median regression with the reweighting scheme in iteratively reweighted least squares. Their experiments show thattheour aggregation algorithm outperforms other alternative algorithms in the presence of label-flipping, backdoor, and Gaussian noise attacks. They also provide theoretical guarantees for the aggregation algorithm.
+
+  * Their repository also uses code from [federated learning](https://github.com/shaoxiongji/federated-learning).
+  * Previous Results: some algorithms can successfully defend Gaussian Noise Attacks, Label-Flipping Attacks and Backdoor Attacks. 
 
 | # of attackers  | 0      | 1      | 2      | 3      | 4      | Average |
 |-----------------|--------|--------|--------|--------|--------|---------|
