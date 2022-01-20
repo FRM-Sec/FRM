@@ -2,7 +2,7 @@
 
 ### This repository is based on a fork of AAAI previous work, a benchmark for residual based Federated Learning: Attack-Resistant Federated Learning with Residual-based Reweighting
 
-Our framework uses reputation scores over time (historical) and freshness in order to consider a time decay (algorithmic) function that penalises updates more when the occur in the beginning of a window of time `--s` as specified in our parameters options.py. These are new enhancements we provided on top of the existing core framework of the AAAI paper that follows.
+Our framework uses reputation scores over time (historical) and freshness in order to consider a time decay (algorithmic) function that penalises updates more when the occur in the beginning of a window of time `--s` as specified in our parameters [options.py](https://github.com/FRM-Sec/FRM/blob/master/FedAvg/options.py). These are new enhancements we provided on top of the existing core framework of the AAAI paper that follows.
 
 In their framework, they use is a PyTorch implementation as seen in their [paper](https://arxiv.org/abs/1912.11464). They present a novel aggregation algorithm with residual-based reweighting to defend federated learning. Their aggregation algorithm combines repeated median regression with the reweighting scheme in iteratively reweighted least squares. Their experiments show thattheour aggregation algorithm outperforms other alternative algorithms in the presence of label-flipping, backdoor, and Gaussian noise attacks. They also provide theoretical guarantees for the aggregation algorithm.
 
@@ -150,7 +150,7 @@ Label Flipping attack on SURL
 !pipenv run python main_nn.py --model URLNet --dataset URL --epochs 100 --gpu 0 --iid 0 --num_users 7 --num_attackers 3  --attack_label 0 --agg irls --reputation_active 1 --kappa 0.3 --a 0.5 
 ```
 
-Change `--agg` tag to select aggregation algorithm and change `--num_attackers` to specify the number of attackers. Note that in our experiments the `--num_users` + `--num_attackers` comprises the 100% of users. Also, we add a new set of parameters, a boolean `--reputation_active`, `--a`, `--eta`, `--W` , `--a`, `--z`, `--s` as specified in options.py   
+Change `--agg` tag to select aggregation algorithm and change `--num_attackers` to specify the number of attackers. Note that in our experiments the `--num_users` + `--num_attackers` comprises the 100% of users. Also, we add a new set of parameters, a boolean `--reputation_active`, `--a`, `--eta`, `--W` , `--a`, `--z`, `--s` as specified in [options.py](https://github.com/FRM-Sec/FRM/blob/master/FedAvg/options.py).  
 
 ### Backdoor attack experiments
 
