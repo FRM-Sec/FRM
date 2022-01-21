@@ -2,6 +2,25 @@
 # -*- coding: utf-8 -*-
 # Python version: 3.6
 
+# Copyright (C) 2021 - 2022
+# @author IMDEA NETWORKS
+#
+# This file is part of the FRM framework
+#
+# This program is free software: you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation, either version 3
+# of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, see <http://www.gnu.org/licenses>.
+
+
 import matplotlib
 import matplotlib.pyplot as plt
 import os
@@ -14,7 +33,7 @@ from tensorboardX import SummaryWriter
 from options import args_parser
 from Update import LocalUpdate
 from FedNets import build_model
-from averaging import aggregate_weights, get_valid_models, FoolsGold, IRLS_aggregation_split_restricted
+from averaging import aggregate_weights, get_valid_models, FoolsGold, irls_aggregation_split_restricted
 from attack import add_gaussian_noise, change_weight
 from url.UrlHelper import UrlHelper as urlHelper
 
@@ -114,10 +133,6 @@ if __name__ == '__main__':
     else:
         fg = None
 
-    # backdoor for IMC initialization @TODO cleanup later with cloud option
-    # csv_file = '../data/sensitive_websites_dataset_clean.csv'
-    # uh = urlHelper(csv_file).back_door('Health')
-
     # copy weights
     w_glob = net_glob.state_dict()
     net_glob.train()
@@ -129,6 +144,8 @@ if __name__ == '__main__':
     accs = []
     reweights = []
     backdoor_accs = []
+    reputation_window = args.s
+    reputation_timestamp = 0
 
     # reputation initialization
     reputation_effect = []
@@ -188,17 +205,26 @@ if __name__ == '__main__':
 
                 # change a portion of the model gradients to honest
                 if 0 < args.change_rate < 1.:
-                    # Passing a few new arguments to our Reputation Model.
-                    w_honest, reweight = IRLS_aggregation_split_restricted(w_locals,
-                                                                        args.Lambda,
-                                                                        args.thresh,
-                                                                        args.reputation_active,
-                                                                        args.reputation_effect,
-                                                                        args.kappa,
-                                                                        args.eta,
-                                                                        args.W,
-                                                                        args.a,
-                                                                        args.z)
+                    # Restart at min of window size the reputation with reputation_timestamp = 0
+                    if reputation_timestamp < reputation_window:
+                        reputation_timestamp += 1
+                    else:
+                        reputation_timestamp = 0
+
+                    # Passing the new arguments to our Reputation Model based in irls_aggregation_split_restricted.
+                    w_honest, reweight = irls_aggregation_split_restricted(
+                        w_locals,
+                        args.Lambda,
+                        args.thresh,
+                        args.reputation_active,
+                        args.reputation_effect,
+                        reputation_timestamp,
+                        args.kappa,
+                        args.eta,
+                        args.W,
+                        args.a,
+                        args.z
+                    )
                     w = change_weight(w, w_honest, change_rate=args.change_rate)
 
                 args.local_ep = local_ep

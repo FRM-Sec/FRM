@@ -1,6 +1,23 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# Python version: 3.6
+
+# Copyright (C) 2021 - 2022
+# @author IMDEA NETWORKS
+#
+# This file is part of the FRM framework
+#
+# This program is free software: you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation, either version 3
+# of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, see <http://www.gnu.org/licenses>.
 
 import copy
 import torch
@@ -17,9 +34,6 @@ eps = np.finfo(float).eps
 
 
 def aggregate_weights(args, w_locals, net_glob, reweights, fg):
-    # update global weights
-    # choices are ['average', 'median', 'trimmed_mean', 'repeated', 'irls', 'simple_irls', 'irls_median', 'irls_theilsen',
-    #              'irls_gaussian', 'fg']
     if args.agg == 'median':
         print("using simple median Estimator")
         w_glob = simple_median(w_locals)
@@ -31,7 +45,7 @@ def aggregate_weights(args, w_locals, net_glob, reweights, fg):
         w_glob = Repeated_Median_Shard(w_locals)
     elif args.agg == 'irls':
         print("using IRLS Estimator")
-        w_glob, reweight = IRLS_aggregation_split_restricted(w_locals,
+        w_glob, reweight = irls_aggregation_split_restricted(w_locals,
                                                              args.Lambda,
                                                              args.thresh,
                                                              args.reputation_active,
@@ -40,7 +54,8 @@ def aggregate_weights(args, w_locals, net_glob, reweights, fg):
                                                              args.eta,
                                                              args.W,
                                                              args.a,
-                                                             args.z)
+                                                             args.z
+                                                             )
         print(reweight)
         reweights.append(reweight)
     elif args.agg == 'simple_irls':
@@ -305,7 +320,7 @@ def get_valid_models(w_locals):
     return w, invalid_model_idx
 
 
-def reputation_model_reweighting(reweight_sum, reputation_effect, kappa, W, a, z):
+def reputation_model_reweighting(reweight_sum, reputation_effect, reputation_timestamp, kappa, W, a, z):
     """
     Defined function for our reputation model at IMDEA NETWORKS
     BY @tianyuechu and @algarecu
@@ -322,12 +337,15 @@ def reputation_model_reweighting(reweight_sum, reputation_effect, kappa, W, a, z
 
         if reputation_effect is None:
             reputation_effect = []
-        reputation_effect[i].append(belief + a * uncertainty)
-        reputation_timestamp = 0
-        theta = [0] * len(reputation_effect[i])
+        else:
+            reputation_effect = [0] * len(reweight_sum)
 
+        reputation_effect[i].append(belief + a * uncertainty)
+
+        # Restart at window size the reputation_timestamp = 0
+        theta = [0] * len(reputation_effect[i])
         for j in range(len(reputation_effect[i])):
-            theta[j] = pow(z, len(reputation_effect[i]) - j - 1)  #@TODO why to do all this for a simple timestamp?
+            theta[j] = pow(z, len(reputation_effect[i]) - j - 1)  # time decay function
             reputation_timestamp += theta[j] * reputation_effect[i][j]
         reputation_timestamp = reputation_timestamp / sum(theta)
         reweight_sum[i] = reputation_timestamp * reweight_sum[i]
@@ -335,7 +353,18 @@ def reputation_model_reweighting(reweight_sum, reputation_effect, kappa, W, a, z
     return reweight_sum
 
 
-def IRLS_aggregation_split_restricted(w_locals, LAMBDA, thresh, reputation_active, reputation_effect, kappa, W, eta, a, z):
+def irls_aggregation_split_restricted(
+        w_locals,
+        LAMBDA,
+        thresh,
+        reputation_active,
+        reputation_effect,
+        reputation_timestamp,
+        kappa,
+        W,
+        eta,
+        a,
+        z):
     """
             Function to aggregate IRLS over Reputation Model
             :param w_locals:
@@ -397,7 +426,7 @@ def IRLS_aggregation_split_restricted(w_locals, LAMBDA, thresh, reputation_activ
     print(str(reputation_active))
     if reputation_active:
         print("Reputation Active")
-        reweight_sum = reputation_model_reweighting(reweight_sum, reputation_effect, kappa, W, a, z)
+        reweight_sum = reputation_model_reweighting(reweight_sum, reputation_effect, reputation_timestamp, kappa, W, a, z)
         # Printing the reweight_sum before after reputation calculation
         # print("Printing the reweight_sum after any reputation calculation: " + str(reweight_sum))
     else:
