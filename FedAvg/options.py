@@ -1,9 +1,26 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# Python version: 3.6
+
+# Copyright (C) 2021 - 2022
+# @author IMDEA NETWORKS
+#
+# This file is part of the FRM framework
+#
+# This program is free software: you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation, either version 3
+# of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, see <http://www.gnu.org/licenses>.
+
 
 import argparse
-
 
 def str2bool(v):
     if isinstance(v, bool):
@@ -26,7 +43,7 @@ def args_parser():
     parser.add_argument('--local_ep', type=int, default=5, help="the number of local epochs: E")
     parser.add_argument('--local_bs', type=int, default=128, help="local batch size: B")
     parser.add_argument('--local_iter', type=int, default=30, help="local iteration(number of batch)")
-    parser.add_argument('--lr', type=float, default=0.01, help='learning rate')
+    parser.add_argument('--lr', type=float, default=0.5, help='learning rate')
     parser.add_argument('--momentum', type=float, default=0.5, help='SGD momentum (default: 0.5)')
 
     # sampling arguments
@@ -53,13 +70,11 @@ def args_parser():
     parser.add_argument('--backdoor_single_shot_scale_epoch', type=int, default=-1, help="used for one-single-shot; -1 means no single scaled shot")
 
     # aggregation arguments
-    parser.add_argument('--agg', type=str, default='average', choices=['average', 'median', 'trimmed_mean',
-                                                                           'repeated', 'irls', 'simple_irls',
-                                                                           'irls_median', 'irls_theilsen',
-                                                                           'irls_gaussian', 'fg'],
-                        help="Aggregation methods")
+    parser.add_argument('--agg', type=str, default='average', choices=['average', 'median', 'trimmed_mean', 'repeated',
+                                                                       'irls', 'simple_irls','irls_median', 'irls_theilsen',
+                                                                       'irls_gaussian', 'fg'], help="Aggregation methods")
     parser.add_argument('--Lambda', type=float, default=2.0, help='set lambda of irls (default: 2.0)')
-    parser.add_argument('--thresh', type=float, default=0.1, help='set thresh of irls restriction (default: 0.1)')
+    parser.add_argument('--thresh', type=float, default=0.5, help='set thresh of irls restriction (default: 0.5)')
     parser.add_argument('--alpha', type=float, default=0.2, help='set thresh of trimmed mean (default: 0.2)')
     parser.add_argument('--use_memory', type=str2bool, default=True, help="use FoolsGold memory option")
 
@@ -73,11 +88,12 @@ def args_parser():
     parser.add_argument('--seed', type=int, default=1237, help='random seed (default: 1234)')
 
     # our arguments
-    parser.add_argument('--kappa', type=float, default=0.4, required=False, help='the objective function value to fill out in the model when we consider R and S')
-    parser.add_argument('--eta', type=float, default=0.6, required=False, help='eta + k = 1')
-    parser.add_argument('--W', type=float, default=2, required=False, help='weight of the reputation we assigned initially, w=2 assigned in paper by default')
-    parser.add_argument('--a', type=float, default=0.01, required=False, help='a priori probability in the absence of committed belief mass. If we increase a, we scale up reputation')
-    parser.add_argument('--z', type=int, default=0.6, required=False, help='interaction freshness z (0,1). If we increase z we scale up our reputation model')
+    parser.add_argument('--kappa', type=float, default=0.3, required=False, help='weight for positive observation of the objective function applied to model when we consider R and S')
+    parser.add_argument('--eta', type=float, default=0.7, required=False, help='eta + k = 1')
+    parser.add_argument('--W', type=float, default=2, required=False, help='non-information prior weight is the weight of the reputation we assigned initially, w=2 assigned in paper by default')
+    parser.add_argument('--a', type=float, default=0.5, required=False, help='a priori probability in the absence of committed belief mass. If we increase a, we scale up reputation')
+    parser.add_argument('--z', type=float, default=0.5, required=False, help='time decay or interaction freshness z (0,1). If we increase z we scale up our reputation model')
+    arser.add_argument('--s', type=float, default=10, required=False, help='window length')
 
     parser.add_argument('--reputation_active', type=bool, default=False, required=False,
                         help='whether to use our reputation model')
