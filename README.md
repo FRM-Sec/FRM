@@ -1,8 +1,8 @@
 # FRM: Federated Reputation Models for "Securing Federated Sensitive Topic Classification against Poisoning Attacks"
 
-### This repository is based on a fork of AAAI previous work, a benchmark for residual based Federated Learning: Attack-Resistant Federated Learning with Residual-based Reweighting
+### This repository is based on a fork of AAAI previous work, a benchmark for residual based Federated Learning: Attack-Resistant Federated Learning with Residual-based Reweighting. Our NDSS'23 paper extends upon the code of AAAI in residual-based.
 
-Our framework uses reputation scores over time (historical) and freshness in order to consider a time decay (algorithmic) function that penalises updates more when the occur in the beginning of a window of time `--s` as specified in our parameters [options.py](https://github.com/FRM-Sec/FRM/blob/master/FedAvg/options.py). These are new enhancements we provided on top of the existing core framework of the AAAI paper that follows.
+Our NDSS'23 framework uses reputation scores over time (historical) and freshness in order to consider a time decay (algorithmic) function that penalises updates more when the occur in the beginning of a window of time `--s` as specified in our parameters [options.py](https://github.com/FRM-Sec/FRM/blob/master/FedAvg/options.py). These can be tuned as a know and are new enhancements we provide on top of the existing core framework of the AAAI paper providing us the SOTA algorithms.
 
 In their framework, they use is a PyTorch implementation as seen in their [paper](https://arxiv.org/abs/1912.11464). They present a novel aggregation algorithm with residual-based reweighting to defend federated learning. Their aggregation algorithm combines repeated median regression with the reweighting scheme in iteratively reweighted least squares. Their experiments show thattheour aggregation algorithm outperforms other alternative algorithms in the presence of label-flipping, backdoor, and Gaussian noise attacks. They also provide theoretical guarantees for the aggregation algorithm.
 
@@ -16,7 +16,7 @@ In their framework, they use is a PyTorch implementation as seen in their [paper
 | Trimmed Mean    | 88.70% | 88.52% | 87.44% | 85.36% | 82.35% | 86.47%  |
 | Repeated Median | 88.60% | 87.76% | 86.97% | 85.77% | 81.82% | 86.19%  |
 | FoolsGold       | 9.70%  | 9.57%  | 10.72% | 11.42% | 9.98%  | 10.28%  |
-| Ours            | 89.17% | 88.60% | 86.66% | 86.09% | 85.81% | 87.27%  |
+| Residual-Based  | 89.17% | 88.60% | 86.66% | 86.09% | 85.81% | 87.27%  |
 
 *Results of label-flipping attacks on CIFAR-10 dataset with different numbers of attackers.*
 
@@ -38,9 +38,9 @@ Poisoning Attacks] useful in your research, please consider citing:
 @article{imdeadtg2022federatedSensitive,
     title={Securing Federated Sensitive Topic Classification against
 Poisoning Attacks},
-    author={},
-    journal={},
-    year={2022}
+    author={Chu. T., Garcia-Recuero, A., Iordanu, C., Smaragdakis,. G., Laoutaris, N.},
+    journal={NDSS 2023},
+    year={2023}
 }
 ```
 
