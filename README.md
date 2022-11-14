@@ -26,7 +26,7 @@ In their framework, they use is a PyTorch implementation as seen in their [paper
 on CIFAR-10 (right).*
 
 
-### Authors and License: Tianyue Chu and Alvaro Garcia-Recuero. Licensed at IMDEA NETWORKS under GNU Lesser General Public License v3.0.
+### Authors and License: Tianyue Chu and Alvaro Garcia-Recuero. Licensed under Creative Commons NC-ND 4.0
 
 ## Introduction
 Our framework provides secure Federated Learning because we make sure our model bounds updates into a linear regression boundary as the repeated median of this previous work, but with additional features such as a reputation model including freshness, historic of client, etc
@@ -38,7 +38,7 @@ Poisoning Attacks] useful in your research, please consider citing:
 @article{imdeadtg2022federatedSensitive,
     title={Securing Federated Sensitive Topic Classification against
 Poisoning Attacks},
-    author={Chu. T., Garcia-Recuero, A., Iordanu, C., Smaragdakis,. G., Laoutaris, N.},
+    author={Chu, T., Garcia-Recuero, A., Iordanu, C., Smaragdakis, G., Laoutaris, N.},
     journal={NDSS 2023},
     year={2023}
 }
