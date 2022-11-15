@@ -1,12 +1,12 @@
 # FRM: Federated Reputation Models for "Securing Federated Sensitive Topic Classification against Poisoning Attacks"
 
-### This repository is based on a fork of a [workshop work at AAAI](https://github.com/fushuhao6/Attack-Resistant-Federated-Learning), a benchmark for residual based Federated Learning: Attack-Resistant Federated Learning with Residual-based Reweighting. Our NDSS'23 paper extends upon the code of AAAI in residual-based.
+### This repository is based on a fork of the reposiroty of [Attack-Resistant Federated Learning with Residual-based Reweighting](https://github.com/fushuhao6/Attack-Resistant-Federated-Learning) at a [workshop work at AAAI](https://federated-learning.org/rseml2021), a benchmark for residual based Federated Learning: Attack-Resistant Federated Learning with Residual-based Reweighting. Our NDSS'23 paper extends upon the code of AAAI in residual-based.
 
 Our NDSS'23 framework uses reputation scores over time (historical) and freshness in order to consider a time decay (algorithmic) function that penalises updates more when the occur in the beginning of a window of time `--s` as specified in our parameters [options.py](https://github.com/FRM-Sec/FRM/blob/master/FedAvg/options.py). These can be tuned as a know and are new enhancements we provide on top of the existing core framework of the AAAI paper providing us the SOTA algorithms.
 
-In their framework, they use is a PyTorch implementation as seen in their [paper](https://arxiv.org/abs/1912.11464). They present a novel aggregation algorithm with residual-based reweighting to defend federated learning. Their aggregation algorithm combines repeated median regression with the reweighting scheme in iteratively reweighted least squares. Their experiments show thattheour aggregation algorithm outperforms other alternative algorithms in the presence of label-flipping, backdoor, and Gaussian noise attacks. They also provide theoretical guarantees for the aggregation algorithm.
+In our [paper]() we present a novel aggregation algorithm based and extended upon residual-based reweighting to defend against poisoning attacks in federated learning for text as well as image datastes. Our aggregation algorithm combines repeated median regression with a reweighting scheme in iteratively reweighted least squares fashion as precedessor work but we also add robust reputation estimators to produce better defenses againts label flipping and backdoor attacks. Our secure aggregation algorithm outperforms other alternative algorithms in the presence of label-flipping and backdoor attacks. We also provide theoretical guarantees for the estimator of the aggregation algorithm.
 
-  * Their repository also uses code from [federated learning](https://github.com/shaoxiongji/federated-learning).
+  * This repository also uses code from [federated learning](https://github.com/shaoxiongji/federated-learning).
   * Previous Results: some algorithms can successfully defend Gaussian Noise Attacks, Label-Flipping Attacks and Backdoor Attacks. 
 
 | # of attackers  | 0      | 1      | 2      | 3      | 4      | Average |
