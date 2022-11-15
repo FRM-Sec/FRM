@@ -29,13 +29,13 @@ on CIFAR-10 (right).*
 ### Authors and License: Tianyue Chu and Alvaro Garcia-Recuero. Licensed under Creative Commons NC-ND 4.0
 
 ## Introduction
-Our framework provides secure Federated Learning because we make sure our model bounds updates into a linear regression boundary as the repeated median of this previous work, but with additional features such as a reputation model including freshness, historic of client, etc
+Our framework provides secure Federated Learning because we make sure our model bounds updates into a linear regression boundary defined by the repeated median as in a previous AAAI work, but with additional features, namely a robust, parametrizable reputation model including freshness or sliding window, historical behaviour of client. etc.
 
 ## Citing our work:
 If you find [Securing Federated Sensitive Topic Classification against
 Poisoning Attacks] useful in your research, please consider citing:
 ```
-@article{imdeadtg2022federatedSensitive,
+@article{NDSS23FLsecure,
     title={Securing Federated Sensitive Topic Classification against
 Poisoning Attacks},
     author={Chu, T., Garcia-Recuero, A., Iordanu, C., Smaragdakis, G., Laoutaris, N.},
@@ -159,4 +159,4 @@ Change `--agg` tag to select aggregation algorithm and change `--num_attackers` 
 ```
 
 ## Results
-Our plots with results show that...
+Our plots with results are shown in our online camera ready paper for [NDSS 23](https://arxiv.org/abs/2201.13086)
